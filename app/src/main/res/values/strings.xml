@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">vedret</string>
+
+    <string name="search_hint">Sök ort…</string>
+    <string name="use_my_location">Min plats</string>
+    <string name="om">Om</string>
+    <string name="sources_label">Källor</string>
+    <string name="sources_explainer">Värdet är medianen av de källor som svarade.</string>
+
+    <string name="today_label">Idag</string>
+    <string name="tomorrow_label">Imorgon</string>
+
+    <string name="error_no_source">ingen källa svarade</string>
+    <string name="error_unknown_place">okänd ort</string>
+    <string name="error_generic">något gick fel</string>
+
+    <string name="condition_klart">Klart</string>
+    <string name="condition_halvklart">Halvklart</string>
+    <string name="condition_molnigt">Molnigt</string>
+    <string name="condition_regn">Regn</string>
+    <string name="condition_snobyar">Snöbyar</string>
+
+    <string name="settings_title">Inställningar</string>
+    <string name="back">Tillbaka</string>
+    <string name="settings_location_section">Plats</string>
+    <string name="settings_location_auto">Följ min plats</string>
+    <string name="settings_location_static">Statisk plats</string>
+    <string name="settings_location_auto_desc">Använder GPS vid uppdatering.</string>
+    <string name="settings_location_static_desc">Visar alltid samma ort.</string>
+    <string name="settings_refresh_section">Automatisk uppdatering</string>
+    <string name="refresh_off">Av</string>
+    <string name="refresh_15">Var 15:e minut</string>
+    <string name="refresh_30">Var 30:e minut</string>
+    <string name="refresh_60">Varje timme</string>
+    <string name="refresh_120">Varannan timme</string>
+    <string name="refresh_240">Var fjärde timme</string>
+
+    <string name="widget_hero_desc">Vedret</string>
+    <string name="widget_hero_upcoming_desc">Vedret – kommande timmar</string>
+</resources>
