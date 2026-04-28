@@ -9,6 +9,23 @@ android {
     namespace = "se.vedret.app"
     compileSdk = 36
 
+    val releaseKeystore = file("release.keystore")
+    val hasReleaseSigning = releaseKeystore.exists() &&
+        System.getenv("SIGNING_STORE_PASSWORD") != null &&
+        System.getenv("SIGNING_KEY_ALIAS") != null &&
+        System.getenv("SIGNING_KEY_PASSWORD") != null
+
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = releaseKeystore
+                storePassword = System.getenv("SIGNING_STORE_PASSWORD")
+                keyAlias = System.getenv("SIGNING_KEY_ALIAS")
+                keyPassword = System.getenv("SIGNING_KEY_PASSWORD")
+            }
+        }
+    }
+
     defaultConfig {
         applicationId = "se.vedret.app"
         minSdk = 26
@@ -28,6 +45,13 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            // CI provides a real keystore + env vars; locally we fall back to
+            // the debug keystore so `installRelease` still works for perf testing.
+            signingConfig = if (hasReleaseSigning) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
