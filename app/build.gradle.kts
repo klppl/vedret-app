@@ -108,4 +108,5 @@ dependencies {
     implementation(libs.accompanist.permissions)
 
     implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.work.runtime.ktx)
 }

@@ -20,6 +20,7 @@ import se.vedret.app.data.LocationMode
 import se.vedret.app.data.Prefs
 import se.vedret.app.data.WeatherRepository
 import se.vedret.app.location.LocationProvider
+import se.vedret.app.widget.RefreshScheduler
 
 data class WeatherUiState(
     val loading: Boolean = false,
@@ -33,6 +34,7 @@ data class WeatherUiState(
 )
 
 class WeatherViewModel(
+    private val app: Application,
     private val repo: WeatherRepository,
     private val prefs: Prefs,
     private val cities: CityCorpus,
@@ -59,9 +61,11 @@ class WeatherViewModel(
             prefs.locationMode.collectLatest { mode -> update { copy(locationMode = mode) } }
         }
         // Auto-refresh ticker: collectLatest cancels the prior loop on every interval change.
+        // Also reschedules the WorkManager job that keeps widgets fresh when the app is closed.
         viewModelScope.launch {
             prefs.autoRefreshMinutes.collectLatest { minutes ->
                 update { copy(autoRefreshMinutes = minutes) }
+                RefreshScheduler.apply(app, minutes)
                 if (minutes <= 0) return@collectLatest
                 val intervalMs = minutes.toLong() * 60_000L
                 while (isActive) {
@@ -216,6 +220,7 @@ class WeatherViewModel(
             initializer {
                 val app = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as Application
                 WeatherViewModel(
+                    app = app,
                     repo = WeatherRepository(app),
                     prefs = Prefs(app),
                     cities = CityCorpus(app),
