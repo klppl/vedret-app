@@ -2,21 +2,39 @@ package se.vedret.app.widget
 
 import androidx.compose.ui.graphics.Color
 import androidx.glance.unit.ColorProvider
+import se.vedret.app.data.ThemeMode
 
-internal object WidgetColors {
-    private val Surface = Color(0xFF181B22)
-    private val Ink = Color(0xFFE6E6E6)
-    private val Muted = Color(0xFF9AA0A8)
-    private val Faint = Color(0xFF6E747C)
-    private val Line = Color(0xFF262A32)
-    private val Accent = Color(0xFFF5A623)
-    private val Rain = Color(0xFF5AA0FF)
+internal class WidgetPalette(
+    val surface: ColorProvider,
+    val ink: ColorProvider,
+    val muted: ColorProvider,
+    val faint: ColorProvider,
+    val line: ColorProvider,
+    val accent: ColorProvider,
+    val rain: ColorProvider,
+)
 
-    val surface = ColorProvider(Surface)
-    val ink = ColorProvider(Ink)
-    val muted = ColorProvider(Muted)
-    val faint = ColorProvider(Faint)
-    val line = ColorProvider(Line)
-    val accent = ColorProvider(Accent)
-    val rain = ColorProvider(Rain)
+internal fun paletteFor(theme: ThemeMode): WidgetPalette = when (theme) {
+    ThemeMode.RosePine -> RosePineDarkPalette
+    ThemeMode.RosePineDawn -> RosePineDawnPalette
 }
+
+private val RosePineDarkPalette = WidgetPalette(
+    surface = ColorProvider(Color(0xFF1F1D2E)),
+    ink = ColorProvider(Color(0xFFE0DEF4)),
+    muted = ColorProvider(Color(0xFF908CAA)),
+    faint = ColorProvider(Color(0xFF6E6A86)),
+    line = ColorProvider(Color(0xFF403D52)),
+    accent = ColorProvider(Color(0xFFF6C177)),
+    rain = ColorProvider(Color(0xFF9CCFD8)),
+)
+
+private val RosePineDawnPalette = WidgetPalette(
+    surface = ColorProvider(Color(0xFFFFFAF3)),
+    ink = ColorProvider(Color(0xFF575279)),
+    muted = ColorProvider(Color(0xFF797593)),
+    faint = ColorProvider(Color(0xFF9893A5)),
+    line = ColorProvider(Color(0xFFDFDAD9)),
+    accent = ColorProvider(Color(0xFFEA9D34)),
+    rain = ColorProvider(Color(0xFF56949F)),
+)

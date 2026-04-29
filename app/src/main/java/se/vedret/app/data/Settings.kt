@@ -7,6 +7,13 @@ enum class LocationMode {
     }
 }
 
+enum class ThemeMode {
+    RosePine, RosePineDawn;
+    companion object {
+        fun parse(value: String?): ThemeMode = entries.firstOrNull { it.name == value } ?: RosePine
+    }
+}
+
 enum class RefreshInterval(val minutes: Int) {
     Off(0),
     Every15(15),

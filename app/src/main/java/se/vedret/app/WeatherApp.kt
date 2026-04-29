@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import se.vedret.app.ui.SettingsScreen
 import se.vedret.app.ui.WeatherScreen
@@ -15,8 +16,9 @@ private enum class Screen { Weather, Settings }
 
 @Composable
 fun WeatherApp() {
-    VedretTheme {
-        val vm: WeatherViewModel = viewModel(factory = WeatherViewModel.Factory)
+    val vm: WeatherViewModel = viewModel(factory = WeatherViewModel.Factory)
+    val state by vm.state.collectAsStateWithLifecycle()
+    VedretTheme(mode = state.themeMode) {
         var screen by rememberSaveable { mutableStateOf(Screen.Weather) }
         when (screen) {
             Screen.Weather -> WeatherScreen(

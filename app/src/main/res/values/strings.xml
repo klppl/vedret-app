@@ -36,6 +36,12 @@
     <string name="refresh_120">Varannan timme</string>
     <string name="refresh_240">Var fjärde timme</string>
 
+    <string name="settings_theme_section">Tema</string>
+    <string name="theme_rose_pine">Rosé Pine</string>
+    <string name="theme_rose_pine_dawn">Rosé Pine Dawn</string>
+    <string name="theme_rose_pine_desc">Mörkt</string>
+    <string name="theme_rose_pine_dawn_desc">Ljust</string>
+
     <string name="widget_hero_desc">Vedret</string>
     <string name="widget_hero_upcoming_desc">Vedret – kommande timmar</string>
 </resources>

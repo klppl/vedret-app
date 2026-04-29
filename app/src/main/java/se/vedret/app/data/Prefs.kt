@@ -27,7 +27,7 @@ class Prefs(private val context: Context) {
         val lat = it[Keys.LAST_LAT]; val lon = it[Keys.LAST_LON]
         if (lat != null && lon != null) lat to lon else null
     }
-    val theme: Flow<String> = context.dataStore.data.map { it[Keys.THEME] ?: "System" }
+    val theme: Flow<ThemeMode> = context.dataStore.data.map { ThemeMode.parse(it[Keys.THEME]) }
     val locationMode: Flow<LocationMode> = context.dataStore.data.map {
         LocationMode.parse(it[Keys.LOCATION_MODE])
     }
@@ -43,8 +43,8 @@ class Prefs(private val context: Context) {
         context.dataStore.edit { it[Keys.LAST_LAT] = lat; it[Keys.LAST_LON] = lon }
     }
 
-    suspend fun setTheme(value: String) {
-        context.dataStore.edit { it[Keys.THEME] = value }
+    suspend fun setTheme(value: ThemeMode) {
+        context.dataStore.edit { it[Keys.THEME] = value.name }
     }
 
     suspend fun setLocationMode(value: LocationMode) {

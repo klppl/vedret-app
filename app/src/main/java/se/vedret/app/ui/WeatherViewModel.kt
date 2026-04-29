@@ -18,6 +18,7 @@ import se.vedret.app.data.CityCorpus
 import se.vedret.app.data.Consensus
 import se.vedret.app.data.LocationMode
 import se.vedret.app.data.Prefs
+import se.vedret.app.data.ThemeMode
 import se.vedret.app.data.WeatherRepository
 import se.vedret.app.location.LocationProvider
 import se.vedret.app.widget.RefreshScheduler
@@ -31,6 +32,7 @@ data class WeatherUiState(
     val suggestions: List<String> = emptyList(),
     val locationMode: LocationMode = LocationMode.Auto,
     val autoRefreshMinutes: Int = 0,
+    val themeMode: ThemeMode = ThemeMode.RosePine,
 )
 
 class WeatherViewModel(
@@ -59,6 +61,12 @@ class WeatherViewModel(
         // Mirror persisted settings into UI state.
         viewModelScope.launch {
             prefs.locationMode.collectLatest { mode -> update { copy(locationMode = mode) } }
+        }
+        viewModelScope.launch {
+            prefs.theme.collectLatest { theme ->
+                update { copy(themeMode = theme) }
+                runCatching { se.vedret.app.widget.WidgetUpdater.refreshAll(app) }
+            }
         }
         // Auto-refresh ticker: collectLatest cancels the prior loop on every interval change.
         // Also reschedules the WorkManager job that keeps widgets fresh when the app is closed.
@@ -140,6 +148,10 @@ class WeatherViewModel(
 
     fun setAutoRefreshMinutes(minutes: Int) {
         viewModelScope.launch { prefs.setAutoRefreshMinutes(minutes) }
+    }
+
+    fun setThemeMode(mode: ThemeMode) {
+        viewModelScope.launch { prefs.setTheme(mode) }
     }
 
     private suspend fun fallbackByLastKnown(): Consensus {

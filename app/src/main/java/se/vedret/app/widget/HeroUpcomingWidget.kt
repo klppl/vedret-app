@@ -5,17 +5,19 @@ import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.preferences.core.Preferences
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalContext
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
-import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.cornerRadius
+import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
+import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -25,6 +27,7 @@ import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
+import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
@@ -32,14 +35,15 @@ import se.vedret.app.MainActivity
 import se.vedret.app.data.Condition
 import se.vedret.app.data.Consensus
 import se.vedret.app.data.Slot
+import se.vedret.app.data.ThemeMode
 import kotlin.math.roundToInt
 
 class HeroUpcomingWidget : GlanceAppWidget() {
     override val sizeMode: SizeMode = SizeMode.Single
+    override val stateDefinition = PreferencesGlanceStateDefinition
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val data = WidgetData.loadCached(context)
-        provideContent { HeroUpcomingContent(data) }
+        provideContent { HeroUpcomingContent() }
     }
 }
 
@@ -48,32 +52,37 @@ class HeroUpcomingWidgetReceiver : GlanceAppWidgetReceiver() {
 }
 
 @Composable
-private fun HeroUpcomingContent(data: Consensus?) {
+private fun HeroUpcomingContent() {
+    val state = currentState<Preferences>()
+    val theme = ThemeMode.parse(state[WidgetStateKeys.Theme])
+    val palette = paletteFor(theme)
+    val data = WidgetData.parse(state[WidgetStateKeys.DataJson])
     val context = LocalContext.current
+
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
-            .background(WidgetColors.surface)
+            .background(palette.surface)
             .cornerRadius(20.dp)
             .clickable(actionStartActivity(Intent(context, MainActivity::class.java)))
             .padding(16.dp),
     ) {
         if (data == null) {
             Box(modifier = GlanceModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("…", style = TextStyle(color = WidgetColors.muted, fontSize = 16.sp))
+                Text("…", style = TextStyle(color = palette.muted, fontSize = 16.sp))
             }
             return@Column
         }
-        HeroBlock(data)
+        HeroBlock(data, palette)
         if (data.upcoming.isNotEmpty()) {
             Spacer(GlanceModifier.height(12.dp))
-            UpcomingRow(data.upcoming.take(5))
+            UpcomingRow(data.upcoming.take(5), palette)
         }
     }
 }
 
 @Composable
-private fun UpcomingRow(slots: List<Slot>) {
+private fun UpcomingRow(slots: List<Slot>, palette: WidgetPalette) {
     Row(modifier = GlanceModifier.fillMaxWidth()) {
         slots.forEach { slot ->
             Column(
@@ -82,7 +91,7 @@ private fun UpcomingRow(slots: List<Slot>) {
             ) {
                 Text(
                     text = timeLabel(slot.time),
-                    style = TextStyle(color = WidgetColors.muted, fontSize = 11.sp),
+                    style = TextStyle(color = palette.muted, fontSize = 11.sp),
                 )
                 Spacer(GlanceModifier.height(2.dp))
                 Text(
@@ -93,7 +102,7 @@ private fun UpcomingRow(slots: List<Slot>) {
                 Text(
                     text = "${slot.temperature.roundToInt()}°",
                     style = TextStyle(
-                        color = WidgetColors.ink,
+                        color = palette.ink,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                     ),

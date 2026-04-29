@@ -32,6 +32,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import se.vedret.app.R
 import se.vedret.app.data.LocationMode
 import se.vedret.app.data.RefreshInterval
+import se.vedret.app.data.ThemeMode
 import se.vedret.app.ui.theme.LocalVedretExtras
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -89,6 +90,22 @@ fun SettingsScreen(vm: WeatherViewModel, onBack: () -> Unit) {
                     onClick = { vm.setAutoRefreshMinutes(interval.minutes) },
                 )
             }
+
+            Spacer(Modifier.height(24.dp))
+            SectionHeader(stringResource(R.string.settings_theme_section))
+            ChoiceRow(
+                label = stringResource(R.string.theme_rose_pine),
+                description = stringResource(R.string.theme_rose_pine_desc),
+                selected = state.themeMode == ThemeMode.RosePine,
+                onClick = { vm.setThemeMode(ThemeMode.RosePine) },
+            )
+            ChoiceRow(
+                label = stringResource(R.string.theme_rose_pine_dawn),
+                description = stringResource(R.string.theme_rose_pine_dawn_desc),
+                selected = state.themeMode == ThemeMode.RosePineDawn,
+                onClick = { vm.setThemeMode(ThemeMode.RosePineDawn) },
+            )
+
             Spacer(Modifier.height(48.dp))
         }
     }
