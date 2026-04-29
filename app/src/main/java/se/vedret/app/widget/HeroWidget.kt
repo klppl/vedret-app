@@ -42,6 +42,7 @@ class HeroWidget : GlanceAppWidget() {
     override val stateDefinition = PreferencesGlanceStateDefinition
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+        WidgetUpdater.seedState(context, id)
         provideContent { HeroContent() }
     }
 }

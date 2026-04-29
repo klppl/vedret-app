@@ -2,6 +2,7 @@ package se.vedret.app.widget
 
 import android.content.Context
 import android.util.Log
+import androidx.glance.GlanceId
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.updateAppWidgetState
@@ -26,6 +27,23 @@ internal object WidgetUpdater {
         val manager = GlanceAppWidgetManager(app)
         seedAndUpdate(app, manager, HeroWidget(), theme, dataJson, "HeroWidget")
         seedAndUpdate(app, manager, HeroUpcomingWidget(), theme, dataJson, "HeroUpcomingWidget")
+    }
+
+    /**
+     * Seed a single widget instance's state from prefs + cache. Called from
+     * `provideGlance` on session start so a freshly placed widget renders
+     * immediately instead of stalling on "…" until the next refresh.
+     */
+    suspend fun seedState(context: Context, id: GlanceId) {
+        val app = context.applicationContext
+        val theme = Prefs(app).theme.first().name
+        val dataJson = WidgetData.loadCached(app)?.let { encode(it) }
+        updateAppWidgetState(app, PreferencesGlanceStateDefinition, id) { prefs ->
+            prefs.toMutablePreferences().apply {
+                this[WidgetStateKeys.Theme] = theme
+                if (dataJson != null) this[WidgetStateKeys.DataJson] = dataJson
+            }
+        }
     }
 
     private suspend fun seedAndUpdate(
