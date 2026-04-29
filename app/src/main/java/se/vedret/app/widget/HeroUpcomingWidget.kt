@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalContext
+import androidx.glance.LocalSize
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
@@ -39,7 +40,7 @@ import se.vedret.app.data.ThemeMode
 import kotlin.math.roundToInt
 
 class HeroUpcomingWidget : GlanceAppWidget() {
-    override val sizeMode: SizeMode = SizeMode.Single
+    override val sizeMode: SizeMode = SizeMode.Exact
     override val stateDefinition = PreferencesGlanceStateDefinition
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
@@ -59,6 +60,8 @@ private fun HeroUpcomingContent() {
     val palette = paletteFor(theme)
     val data = WidgetData.parse(state[WidgetStateKeys.DataJson])
     val context = LocalContext.current
+    val size = LocalSize.current
+    val scale = scaleFor(size.width.value)
 
     Column(
         modifier = GlanceModifier
@@ -74,16 +77,19 @@ private fun HeroUpcomingContent() {
             }
             return@Column
         }
-        HeroBlock(data, palette)
+        HeroBlock(data, palette, scale)
+        // The flexible spacer absorbs whatever vertical space the launcher
+        // gives us beyond the hero + upcoming, so the row sticks to the
+        // bottom on roomier hosts (Samsung One UI) instead of leaving a gap.
+        Spacer(GlanceModifier.defaultWeight())
         if (data.upcoming.isNotEmpty()) {
-            Spacer(GlanceModifier.height(12.dp))
-            UpcomingRow(data.upcoming.take(5), palette)
+            UpcomingRow(data.upcoming.take(5), palette, scale)
         }
     }
 }
 
 @Composable
-private fun UpcomingRow(slots: List<Slot>, palette: WidgetPalette) {
+private fun UpcomingRow(slots: List<Slot>, palette: WidgetPalette, scale: HeroScale) {
     Row(modifier = GlanceModifier.fillMaxWidth()) {
         slots.forEach { slot ->
             Column(
@@ -92,19 +98,19 @@ private fun UpcomingRow(slots: List<Slot>, palette: WidgetPalette) {
             ) {
                 Text(
                     text = timeLabel(slot.time),
-                    style = TextStyle(color = palette.muted, fontSize = 11.sp),
+                    style = TextStyle(color = palette.muted, fontSize = scale.factSp),
                 )
                 Spacer(GlanceModifier.height(2.dp))
                 Text(
                     text = Condition.emojiFor(slot.condition),
-                    style = TextStyle(fontSize = 18.sp),
+                    style = TextStyle(fontSize = scale.descSp.value.coerceAtLeast(16f).sp),
                 )
                 Spacer(GlanceModifier.height(2.dp))
                 Text(
                     text = "${slot.temperature.roundToInt()}°",
                     style = TextStyle(
                         color = palette.ink,
-                        fontSize = 14.sp,
+                        fontSize = scale.descSp,
                         fontWeight = FontWeight.Medium,
                     ),
                 )

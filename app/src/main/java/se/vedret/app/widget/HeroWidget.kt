@@ -3,12 +3,14 @@ package se.vedret.app.widget
 import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.Preferences
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalContext
+import androidx.glance.LocalSize
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
@@ -38,7 +40,9 @@ import se.vedret.app.data.ThemeMode
 import kotlin.math.roundToInt
 
 class HeroWidget : GlanceAppWidget() {
-    override val sizeMode: SizeMode = SizeMode.Single
+    // Exact mode lets the composable read LocalSize.current so we can scale
+    // the big number with whatever the launcher actually allocates.
+    override val sizeMode: SizeMode = SizeMode.Exact
     override val stateDefinition = PreferencesGlanceStateDefinition
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
@@ -58,6 +62,7 @@ internal fun HeroContent() {
     val palette = paletteFor(theme)
     val data = WidgetData.parse(state[WidgetStateKeys.DataJson])
     val context = LocalContext.current
+    val size = LocalSize.current
 
     Box(
         modifier = GlanceModifier
@@ -66,7 +71,7 @@ internal fun HeroContent() {
             .cornerRadius(20.dp)
             .clickable(actionStartActivity(Intent(context, MainActivity::class.java)))
             .padding(12.dp),
-        contentAlignment = Alignment.CenterStart,
+        contentAlignment = Alignment.Center,
     ) {
         if (data == null) {
             Text(
@@ -74,20 +79,32 @@ internal fun HeroContent() {
                 style = TextStyle(color = palette.muted, fontSize = 16.sp),
             )
         } else {
-            HeroBlock(data, palette)
+            HeroBlock(data, palette, scaleFor(size.width.value))
         }
     }
 }
 
+internal data class HeroScale(
+    val numberSp: TextUnit,
+    val descSp: TextUnit,
+    val factSp: TextUnit,
+)
+
+internal fun scaleFor(widthDp: Float): HeroScale = when {
+    widthDp >= 320f -> HeroScale(64.sp, 16.sp, 13.sp)
+    widthDp >= 240f -> HeroScale(54.sp, 15.sp, 12.sp)
+    else -> HeroScale(44.sp, 13.sp, 11.sp)
+}
+
 @Composable
-internal fun HeroBlock(data: Consensus, palette: WidgetPalette) {
+internal fun HeroBlock(data: Consensus, palette: WidgetPalette, scale: HeroScale) {
     val current = data.current ?: return
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
             text = "${current.temperature.roundToInt()}",
             style = TextStyle(
                 color = palette.accent,
-                fontSize = 48.sp,
+                fontSize = scale.numberSp,
                 fontWeight = FontWeight.Normal,
             ),
         )
@@ -95,12 +112,12 @@ internal fun HeroBlock(data: Consensus, palette: WidgetPalette) {
         Column(modifier = GlanceModifier.defaultWeight()) {
             Text(
                 text = "grader och ${Condition.displayFor(current.condition)} ${Condition.emojiFor(current.condition)}",
-                style = TextStyle(color = palette.ink, fontSize = 14.sp),
+                style = TextStyle(color = palette.ink, fontSize = scale.descSp),
             )
             Spacer(GlanceModifier.height(2.dp))
             Text(
                 text = "${current.windSpeed.roundToInt()} m/s vind · ${current.rainProbability}% risk för regn",
-                style = TextStyle(color = palette.muted, fontSize = 11.sp),
+                style = TextStyle(color = palette.muted, fontSize = scale.factSp),
             )
         }
     }
