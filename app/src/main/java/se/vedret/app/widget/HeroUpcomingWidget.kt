@@ -75,15 +75,14 @@ private fun HeroUpcomingContent() {
 
     Column(
         modifier = GlanceModifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .background(palette.surface)
             .cornerRadius(20.dp)
             .clickable(actionStartActivity(Intent(context, MainActivity::class.java)))
             .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
     ) {
         if (data == null) {
-            Box(modifier = GlanceModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Box(modifier = GlanceModifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
                 Text("…", style = TextStyle(color = palette.muted, fontSize = 16.sp))
             }
             return@Column
