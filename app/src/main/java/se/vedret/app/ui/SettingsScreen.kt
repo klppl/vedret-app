@@ -23,16 +23,25 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import se.vedret.app.R
 import se.vedret.app.data.LocationMode
 import se.vedret.app.data.RefreshInterval
 import se.vedret.app.data.ThemeMode
+import se.vedret.app.system.BatteryOptimization
 import se.vedret.app.ui.theme.LocalVedretExtras
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -106,8 +115,62 @@ fun SettingsScreen(vm: WeatherViewModel, onBack: () -> Unit) {
                 onClick = { vm.setThemeMode(ThemeMode.RosePineDawn) },
             )
 
+            Spacer(Modifier.height(24.dp))
+            SectionHeader(stringResource(R.string.settings_battery_section))
+            BatteryOptimizationRow()
+
             Spacer(Modifier.height(48.dp))
         }
+    }
+}
+
+@Composable
+private fun BatteryOptimizationRow() {
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var ignoring by remember { mutableStateOf(BatteryOptimization.isIgnoring(context)) }
+
+    // Re-check on resume so the row reflects the user's choice after they
+    // come back from the system battery dialog.
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                ignoring = BatteryOptimization.isIgnoring(context)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
+    val extras = LocalVedretExtras.current
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { BatteryOptimization.openSettings(context) }
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = if (ignoring) stringResource(R.string.battery_excluded)
+                else stringResource(R.string.battery_optimized),
+                style = MaterialTheme.typography.bodyLarge,
+                color = if (ignoring) MaterialTheme.colorScheme.primary
+                else MaterialTheme.colorScheme.onSurface,
+            )
+            Text(
+                text = stringResource(R.string.battery_description),
+                style = MaterialTheme.typography.bodySmall,
+                color = extras.muted,
+            )
+        }
+        Text(
+            text = if (ignoring) stringResource(R.string.battery_action_manage)
+            else stringResource(R.string.battery_action_allow),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.primary,
+        )
     }
 }
 

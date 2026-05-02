@@ -44,4 +44,11 @@
 
     <string name="widget_hero_desc">Vedret</string>
     <string name="widget_hero_upcoming_desc">Vedret – kommande timmar</string>
+
+    <string name="settings_battery_section">Bakgrundskörning</string>
+    <string name="battery_optimized">Batterioptimering aktiv</string>
+    <string name="battery_excluded">Obegränsad bakgrundskörning tillåten</string>
+    <string name="battery_action_allow">Öppna inställningar</string>
+    <string name="battery_action_manage">Hantera</string>
+    <string name="battery_description">Krävs för att widgeten ska uppdateras automatiskt när appen är stängd. Tryck här för att öppna systemlistan och välj vedret → Optimera inte. Samsung-användare: lägg dessutom till vedret i \"Apparna som aldrig sover\" under Batteriinställningarna.</string>
 </resources>

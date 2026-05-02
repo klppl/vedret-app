@@ -1,6 +1,7 @@
 package se.vedret.app.widget
 
 import android.content.Context
+import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.flow.first
@@ -24,25 +25,37 @@ class RefreshWorker(
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
+        Log.d(TAG, "doWork start (run #${runAttemptCount})")
         return try {
             val ctx = applicationContext
             val prefs = Prefs(ctx)
             val repo = WeatherRepository(ctx)
             val snap = prefs.snapshot()
-            // locationMode is fetched but doesn't change the path here; documented above.
             prefs.locationMode.first()
             when {
-                snap.coords != null -> repo.byCoords(snap.coords.first, snap.coords.second)
-                snap.query != null -> repo.byCity(snap.query)
-                else -> repo.byIp()
+                snap.coords != null -> {
+                    Log.d(TAG, "fetching by coords (${snap.coords.first}, ${snap.coords.second})")
+                    repo.byCoords(snap.coords.first, snap.coords.second)
+                }
+                snap.query != null -> {
+                    Log.d(TAG, "fetching by city '${snap.query}'")
+                    repo.byCity(snap.query)
+                }
+                else -> {
+                    Log.d(TAG, "fetching by IP (no last-known location)")
+                    repo.byIp()
+                }
             }
+            Log.d(TAG, "doWork success")
             Result.success()
         } catch (t: Throwable) {
+            Log.w(TAG, "doWork failed; will retry", t)
             Result.retry()
         }
     }
 
     companion object {
         const val NAME = "vedret-refresh"
+        private const val TAG = "RefreshWorker"
     }
 }

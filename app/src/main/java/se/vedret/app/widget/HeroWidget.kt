@@ -1,5 +1,6 @@
 package se.vedret.app.widget
 
+import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
@@ -53,6 +54,15 @@ class HeroWidget : GlanceAppWidget() {
 
 class HeroWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = HeroWidget()
+
+    override fun onUpdate(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetIds: IntArray
+    ) {
+        super.onUpdate(context, appWidgetManager, appWidgetIds)
+        RefreshScheduler.forceRefresh(context)
+    }
 }
 
 @Composable
