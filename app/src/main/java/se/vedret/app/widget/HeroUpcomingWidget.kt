@@ -80,6 +80,7 @@ private fun HeroUpcomingContent() {
             .cornerRadius(20.dp)
             .clickable(actionStartActivity(Intent(context, MainActivity::class.java)))
             .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         if (data == null) {
             Box(modifier = GlanceModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -88,10 +89,7 @@ private fun HeroUpcomingContent() {
             return@Column
         }
         HeroBlock(data, palette, scale)
-        // The flexible spacer absorbs whatever vertical space the launcher
-        // gives us beyond the hero + upcoming, so the row sticks to the
-        // bottom on roomier hosts (Samsung One UI) instead of leaving a gap.
-        Spacer(GlanceModifier.defaultWeight())
+        Spacer(GlanceModifier.height(16.dp))
         if (data.upcoming.isNotEmpty()) {
             UpcomingRow(data.upcoming.take(5), palette, scale)
         }
