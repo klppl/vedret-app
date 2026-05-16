@@ -4,6 +4,7 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.Preferences
@@ -71,28 +72,47 @@ private fun HeroUpcomingContent() {
     val data = WidgetData.parse(state[WidgetStateKeys.DataJson])
     val context = LocalContext.current
     val size = LocalSize.current
-    val scale = scaleFor(size.width.value)
+    val scale = upcomingScaleFor(size.width.value, size.height.value)
 
+    // fillMaxSize paints the rounded card across the whole launcher cell so
+    // there's no transparent gap; the scale tier — chosen by the more
+    // constrained axis — keeps the hero + upcoming inside that same cell at
+    // any height the launcher allocates above minHeight.
     Column(
         modifier = GlanceModifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .background(palette.surface)
             .cornerRadius(20.dp)
             .clickable(actionStartActivity(Intent(context, MainActivity::class.java)))
-            .padding(16.dp),
+            .padding(scale.padDp),
     ) {
         if (data == null) {
-            Box(modifier = GlanceModifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
+            Box(modifier = GlanceModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text("…", style = TextStyle(color = palette.muted, fontSize = 16.sp))
             }
             return@Column
         }
-        HeroBlock(data, palette, scale)
-        Spacer(GlanceModifier.height(16.dp))
+        HeroBlock(data, palette, scale.heroScale)
+        Spacer(GlanceModifier.height(scale.spacerDp))
         if (data.upcoming.isNotEmpty()) {
-            UpcomingRow(data.upcoming.take(5), palette, scale)
+            UpcomingRow(data.upcoming.take(5), palette, scale.heroScale)
         }
     }
+}
+
+internal data class UpcomingScale(
+    val heroScale: HeroScale,
+    val padDp: Dp,
+    val spacerDp: Dp,
+)
+
+internal fun upcomingScaleFor(widthDp: Float, heightDp: Float): UpcomingScale = when {
+    widthDp >= 320f && heightDp >= 180f ->
+        UpcomingScale(HeroScale(64.sp, 16.sp, 13.sp), 16.dp, 16.dp)
+    widthDp >= 240f && heightDp >= 150f ->
+        UpcomingScale(HeroScale(54.sp, 15.sp, 12.sp), 12.dp, 10.dp)
+    else ->
+        UpcomingScale(HeroScale(44.sp, 13.sp, 11.sp), 8.dp, 6.dp)
 }
 
 @Composable
