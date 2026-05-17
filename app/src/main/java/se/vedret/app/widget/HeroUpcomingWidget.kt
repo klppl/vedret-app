@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.Preferences
@@ -42,12 +43,28 @@ import se.vedret.app.data.ThemeMode
 import kotlin.math.roundToInt
 
 class HeroUpcomingWidget : GlanceAppWidget() {
-    override val sizeMode: SizeMode = SizeMode.Exact
+    // Responsive (not Exact) so Glance hands the launcher a SizedRemoteViews
+    // set with one pre-rendered tier per declared DpSize. SizeMode.Exact
+    // relies on AppWidgetManager.OPTION_APPWIDGET_* keys being populated when
+    // the composable runs; One UI tears down and rebuilds widget hosts after
+    // the user returns to the launcher, and during that window those keys
+    // sometimes only contain the metadata defaults, which made the
+    // Exact-mode composition fall through to the smallest tier and clip the
+    // upcoming row. With Responsive, the launcher picks the tier from the
+    // pre-rendered set, so this is no longer dependent on the options Bundle.
+    override val sizeMode: SizeMode = SizeMode.Responsive(SUPPORTED_SIZES)
     override val stateDefinition = PreferencesGlanceStateDefinition
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         WidgetUpdater.seedState(context, id)
         provideContent { HeroUpcomingContent() }
+    }
+
+    companion object {
+        internal val SMALL = DpSize(250.dp, 130.dp)
+        internal val MEDIUM = DpSize(280.dp, 160.dp)
+        internal val LARGE = DpSize(320.dp, 200.dp)
+        internal val SUPPORTED_SIZES = setOf(SMALL, MEDIUM, LARGE)
     }
 }
 
@@ -72,12 +89,12 @@ private fun HeroUpcomingContent() {
     val data = WidgetData.parse(state[WidgetStateKeys.DataJson])
     val context = LocalContext.current
     val size = LocalSize.current
-    val scale = upcomingScaleFor(size.width.value, size.height.value)
+    val scale = upcomingScaleFor(size)
 
     // fillMaxSize paints the rounded card across the whole launcher cell so
-    // there's no transparent gap; the scale tier — chosen by the more
-    // constrained axis — keeps the hero + upcoming inside that same cell at
-    // any height the launcher allocates above minHeight.
+    // there's no transparent gap; the launcher picks one of the declared
+    // tiers (small/medium/large) so the hero + upcoming row always fit
+    // inside that cell.
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
@@ -106,10 +123,15 @@ internal data class UpcomingScale(
     val spacerDp: Dp,
 )
 
-internal fun upcomingScaleFor(widthDp: Float, heightDp: Float): UpcomingScale = when {
-    widthDp >= 320f && heightDp >= 180f ->
+// With SizeMode.Responsive, Glance composes once per DpSize in SUPPORTED_SIZES,
+// so `size` here equals one of those declared tiers and the launcher chooses
+// which pre-rendered RemoteViews to display. We still tolerate sizes that
+// don't exactly match (some launchers report slightly off dimensions) by
+// falling through to the smallest tier.
+internal fun upcomingScaleFor(size: DpSize): UpcomingScale = when {
+    size.width >= HeroUpcomingWidget.LARGE.width && size.height >= HeroUpcomingWidget.LARGE.height ->
         UpcomingScale(HeroScale(64.sp, 16.sp, 13.sp), 16.dp, 16.dp)
-    widthDp >= 240f && heightDp >= 150f ->
+    size.width >= HeroUpcomingWidget.MEDIUM.width && size.height >= HeroUpcomingWidget.MEDIUM.height ->
         UpcomingScale(HeroScale(54.sp, 15.sp, 12.sp), 12.dp, 10.dp)
     else ->
         UpcomingScale(HeroScale(44.sp, 13.sp, 11.sp), 8.dp, 6.dp)

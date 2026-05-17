@@ -4,6 +4,7 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,14 +42,25 @@ import se.vedret.app.data.ThemeMode
 import kotlin.math.roundToInt
 
 class HeroWidget : GlanceAppWidget() {
-    // Exact mode lets the composable read LocalSize.current so we can scale
-    // the big number with whatever the launcher actually allocates.
-    override val sizeMode: SizeMode = SizeMode.Exact
+    // Responsive mode hands the launcher pre-rendered RemoteViews for each
+    // declared tier so the launcher (not the composable) picks which to
+    // show. This is more reliable on launchers (notably One UI) that don't
+    // populate AppWidgetManager.OPTION_APPWIDGET_* consistently after a
+    // host rebuild — Exact mode would fall back to metadata defaults at
+    // those moments and render the wrong scale.
+    override val sizeMode: SizeMode = SizeMode.Responsive(SUPPORTED_SIZES)
     override val stateDefinition = PreferencesGlanceStateDefinition
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         WidgetUpdater.seedState(context, id)
         provideContent { HeroContent() }
+    }
+
+    companion object {
+        internal val SMALL = DpSize(180.dp, 50.dp)
+        internal val MEDIUM = DpSize(240.dp, 60.dp)
+        internal val LARGE = DpSize(320.dp, 80.dp)
+        internal val SUPPORTED_SIZES = setOf(SMALL, MEDIUM, LARGE)
     }
 }
 
@@ -100,9 +112,13 @@ internal data class HeroScale(
     val factSp: TextUnit,
 )
 
+// With SizeMode.Responsive, the composable runs once per DpSize in
+// SUPPORTED_SIZES and Glance hands the launcher a SizedRemoteViews set;
+// widthDp here is therefore one of the declared tier widths. The
+// >= comparisons also tolerate launchers that report slightly off sizes.
 internal fun scaleFor(widthDp: Float): HeroScale = when {
-    widthDp >= 320f -> HeroScale(64.sp, 16.sp, 13.sp)
-    widthDp >= 240f -> HeroScale(54.sp, 15.sp, 12.sp)
+    widthDp >= HeroWidget.LARGE.width.value -> HeroScale(64.sp, 16.sp, 13.sp)
+    widthDp >= HeroWidget.MEDIUM.width.value -> HeroScale(54.sp, 15.sp, 12.sp)
     else -> HeroScale(44.sp, 13.sp, 11.sp)
 }
 
