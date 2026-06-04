@@ -150,8 +150,9 @@ fun WeatherScreen(
                         else -> {
                             Hero(current = data.current)
                             Spacer(Modifier.height(24.dp))
-                            if (data.upcoming.isNotEmpty()) {
-                                TodayRow(slots = data.upcoming)
+                            val hourly = data.hourly.ifEmpty { data.upcoming }
+                            if (hourly.isNotEmpty()) {
+                                TodayRow(slots = hourly)
                                 Spacer(Modifier.height(24.dp))
                             }
                             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

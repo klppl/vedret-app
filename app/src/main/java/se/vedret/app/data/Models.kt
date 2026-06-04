@@ -10,6 +10,7 @@ data class Consensus(
     val current: Slot? = null,
     val providers: List<ProviderRow> = emptyList(),
     val upcoming: List<Slot> = emptyList(),
+    val hourly: List<Slot> = emptyList(),
     @SerialName("today_day") val todayDay: DayForecast? = null,
     val days: List<DayForecast> = emptyList(),
     val sunrise: String? = null,

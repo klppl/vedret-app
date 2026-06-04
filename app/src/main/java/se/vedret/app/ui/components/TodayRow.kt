@@ -3,12 +3,13 @@ package se.vedret.app.ui.components
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -32,23 +33,22 @@ fun TodayRow(slots: List<Slot>) {
             .fillMaxWidth()
             .border(1.dp, extras.line, RoundedCornerShape(16.dp)),
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp, horizontal = 8.dp),
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(vertical = 12.dp, horizontal = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            slots.forEach { slot -> SlotCell(slot) }
+            items(slots) { slot -> SlotCell(slot) }
         }
     }
 }
 
 @Composable
-private fun RowScope.SlotCell(slot: Slot) {
+private fun SlotCell(slot: Slot) {
     val extras = LocalVedretExtras.current
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.weight(1f),
+        modifier = Modifier.width(56.dp),
     ) {
         Text(timeLabel(slot.time), style = MaterialTheme.typography.bodySmall, color = extras.muted)
         Spacer(Modifier.height(6.dp))
