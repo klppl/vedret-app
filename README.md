@@ -24,6 +24,14 @@ Native Android client for [vedret.se](https://vedret.se) — consensus weather f
 - Location by GPS, city search with autocomplete, or IP fallback
 - Light/dark theme following the system
 
+## Install
+
+Grab the latest APK from [releases](https://github.com/klppl/vedret-app/releases) — or add this repo to [Obtainium](https://github.com/ImranR98/Obtainium) to get updates automatically:
+
+```
+https://github.com/klppl/vedret-app
+```
+
 ## Building
 
 ```bash
