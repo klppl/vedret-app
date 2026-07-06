@@ -22,10 +22,6 @@ Native Android client for [vedret.se](https://vedret.se) — consensus weather f
 - Location by GPS, city search with autocomplete, or IP fallback
 - Light/dark theme following the system
 
-## How it works
-
-The app is a thin client — all aggregation (median rain probability, condition voting, outlier resistance) lives server-side in [vedret.se](https://vedret.se), so improving the forecast never requires an app update. The JSON contract is documented in [android.md](android.md).
-
 ## Building
 
 ```bash
