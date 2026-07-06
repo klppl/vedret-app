@@ -1,0 +1,34 @@
+# vedret
+
+![license](https://img.shields.io/github/license/klppl/vedret-app)
+![release](https://img.shields.io/github/v/release/klppl/vedret-app)
+![android](https://img.shields.io/badge/android-8.0%2B-3DDC84?logo=android&logoColor=white)
+![kotlin](https://img.shields.io/badge/kotlin-100%25-7F52FF?logo=kotlin&logoColor=white)
+![källor](https://img.shields.io/badge/väderkällor-7_st,_1_sanning-F97316)
+![dalecarlian](https://img.shields.io/badge/dalecarlian-%E2%9D%A4-801818)
+
+Native Android client for [vedret.se](https://vedret.se) — consensus weather for Swedish locations. Instead of trusting one forecast, vedret asks SMHI, YR, Open-Meteo (plus ECMWF, DWD ICON and DMI models), OpenWeather, WeatherAPI and Pirate Weather about the same place and shows you what they agree on.
+
+## Features
+
+- Current weather, hour-by-hour scrollable forecast, and a 5-day expandable outlook
+- Rain that never hides: the day flips to 🌧️ when the sources agree rain is coming, even if the dry hours outnumber the wet ones
+- Two home-screen widgets (current + upcoming hours), Glance-based
+- Location by GPS, city search with autocomplete, or IP fallback
+- Light/dark theme following the system
+
+## How it works
+
+The app is a thin client — all aggregation (median rain probability, condition voting, outlier resistance) lives server-side in [vedret.se](https://vedret.se), so improving the forecast never requires an app update. The JSON contract is documented in [android.md](android.md).
+
+## Building
+
+```bash
+./gradlew assembleDebug
+```
+
+Release builds are signed in CI; locally the release build falls back to the debug keystore.
+
+## License
+
+[GPL-3.0](LICENSE)
