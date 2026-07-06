@@ -9,6 +9,11 @@
 
 Native Android client for [vedret.se](https://vedret.se) — consensus weather for Swedish locations. Instead of trusting one forecast, vedret asks SMHI, YR, Open-Meteo (plus ECMWF, DWD ICON and DMI models), OpenWeather, WeatherAPI and Pirate Weather about the same place and shows you what they agree on.
 
+<p>
+  <img src="docs/screenshot1.png" alt="Main screen: current weather for Örebro, hourly forecast row and 5-day outlook" width="270">
+  <img src="docs/screenshot2.png" alt="Settings: location mode, auto-update interval and Rosé Pine themes" width="270">
+</p>
+
 ## Features
 
 - Current weather, hour-by-hour scrollable forecast, and a 5-day expandable outlook
