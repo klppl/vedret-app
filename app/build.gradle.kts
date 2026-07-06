@@ -104,7 +104,6 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.datetime)
 
-    implementation(libs.play.services.location)
     implementation(libs.accompanist.permissions)
 
     implementation(libs.androidx.glance.appwidget)
