@@ -45,12 +45,13 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            // CI provides a real keystore + env vars; locally we fall back to
-            // the debug keystore so `installRelease` still works for perf testing.
-            signingConfig = if (hasReleaseSigning) {
-                signingConfigs.getByName("release")
-            } else {
-                signingConfigs.getByName("debug")
+            // CI provides a real keystore + env vars. F-Droid builds with
+            // neither and needs an unsigned APK (they sign with their own
+            // key); pass -PdebugSign for a locally installable release build.
+            signingConfig = when {
+                hasReleaseSigning -> signingConfigs.getByName("release")
+                project.hasProperty("debugSign") -> signingConfigs.getByName("debug")
+                else -> null
             }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
