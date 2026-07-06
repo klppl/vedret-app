@@ -30,8 +30,8 @@ android {
         applicationId = "se.vedret.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 13
-        versionName = "0.1.12"
+        versionCode = 14
+        versionName = "0.1.13"
 
         buildConfigField("String", "API_BASE", "\"https://vedret.se/\"")
     }
