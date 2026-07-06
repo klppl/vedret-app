@@ -70,6 +70,12 @@ android {
         compose = true
         buildConfig = true
     }
+    dependenciesInfo {
+        // Google-encrypted dependency metadata block — only Play can read it,
+        // and IzzyOnDroid/F-Droid reject APKs that carry it.
+        includeInApk = false
+        includeInBundle = false
+    }
     packaging {
         resources.excludes += setOf(
             "/META-INF/{AL2.0,LGPL2.1}",
