@@ -1,0 +1,14 @@
+vedret is a native Android client for vedret.se — consensus weather for Swedish locations.
+
+Instead of trusting a single forecast, vedret asks SMHI, YR, Open-Meteo (plus the ECMWF, DWD ICON and DMI models), OpenWeather, WeatherAPI and Pirate Weather about the same place and shows what they agree on: temperatures are averaged, the weather symbol follows the majority, and rain probability uses the median so a single alarmist source can't skew it. When the sources agree rain is likely, the forecast says so — even when the dry hours outnumber the wet ones.
+
+Features:
+
+- Current weather with wind, rain risk and UV index
+- Hour-by-hour scrollable forecast
+- 5-day outlook with expandable per-day detail
+- Two home-screen widgets (current conditions and upcoming hours)
+- Location via GPS (no Google Play Services required), city search with autocomplete, or IP-based fallback
+- Light and dark themes
+
+Note: forecasts cover Swedish locations only, and the app speaks Swedish.
