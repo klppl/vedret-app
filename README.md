@@ -1,5 +1,7 @@
 # vedret
 
+[![License: Lagom](https://img.shields.io/badge/license-lagom-9E2B25)](https://klppl.github.io/lagom-license/)
+
 ![license](https://img.shields.io/github/license/klppl/vedret-app)
 ![release](https://img.shields.io/github/v/release/klppl/vedret-app)
 ![android](https://img.shields.io/badge/android-8.0%2B-3DDC84?logo=android&logoColor=white)
